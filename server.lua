@@ -48,3 +48,13 @@ RegisterNetEvent('qb-djbooth:server:changeVolume', function(volume, zoneNum)
     end
     TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = zoneNum })
 end)
+
+AddEventHandler('onResourceStop', function(resource)
+    if resource ~= GetCurrentResourceName() then return end
+	for i = 1, #Config.Locations do
+		if Config.Locations[i].playing then
+			local zoneLabel = Config.Locations[i].label..i
+			xSound:Destroy(-1, zoneLabel)
+		end
+	end
+end)
