@@ -3,8 +3,8 @@ local xSound = exports.xsound
 RegisterNetEvent('qb-djbooth:server:playMusic', function(song, zoneNum)
     local src = source
 	local Booth = Config.Locations[zoneNum]
-	local zoneLabel = Config.Locations[zoneNum].label..zoneNum
-    xSound:PlayUrlPos(-1, zoneLabel, song, Config.DefaultVolume, GetEntityCoords(GetPlayerPed(src)))
+	local zoneLabel = Config.Locations[zoneNum].job..zoneNum
+    xSound:PlayUrlPos(-1, zoneLabel, song, Booth.DefaultVolume, GetEntityCoords(GetPlayerPed(src)))
     xSound:Distance(-1, zoneLabel, Booth.radius)
     Config.Locations[zoneNum].playing = true
     TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = zoneNum })
@@ -12,7 +12,7 @@ end)
 
 RegisterNetEvent('qb-djbooth:server:stopMusic', function(data)
     local src = source
-	local zoneLabel = Config.Locations[data.zoneNum].label..data.zoneName
+	local zoneLabel = Config.Locations[data.zoneNum].job..data.zoneName
     if Config.Locations[data.zoneNum].playing then
         Config.Locations[data.zoneNum].playing = false
         xSound:Destroy(-1, zoneLabel)
@@ -41,7 +41,7 @@ end)
 RegisterNetEvent('qb-djbooth:server:changeVolume', function(volume, zoneNum)
     local src = source
 	local Booth = Config.Locations[zoneNum]
-	local zoneLabel = Config.Locations[zoneNum].label..zoneNum
+	local zoneLabel = Config.Locations[zoneNum].job..zoneNum
     if not tonumber(volume) then return end
     if Config.Locations[zoneNum].playing then
         xSound:setVolume(-1, zoneLabel, volume)
@@ -53,7 +53,7 @@ AddEventHandler('onResourceStop', function(resource)
     if resource ~= GetCurrentResourceName() then return end
 	for i = 1, #Config.Locations do
 		if Config.Locations[i].playing then
-			local zoneLabel = Config.Locations[i].label..i
+			local zoneLabel = Config.Locations[i].job..i
 			xSound:Destroy(-1, zoneLabel)
 		end
 	end
