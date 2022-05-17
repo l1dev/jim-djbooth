@@ -1,13 +1,17 @@
 # qb-djbooth
-Play music on configured coords!
+Play music at configured coords!
+
+My edit that uses qb-menu icons and allows qb-target to be used for every location
+Targets are generated as "Circle Zones" from the coords set for each location.
 
 ## Dependencies
 * [xsound](https://github.com/Xogy/xsound)
 * [PolyZone](https://github.com/qbcore-framework/PolyZone)
 * [qb-menu](https://github.com/qbcore-framework/qb-menu)
+* [qb-target](https://github.com/qbcore-framework/qb-target)
 
 ## Preview
-![unknown (12)](https://user-images.githubusercontent.com/57848836/139512432-729dbcff-d6b1-49b7-9bc3-e82c163c8621.png)
+![unknown (12)](https://i.imgur.com/6dE2Pir.jpeg)
 
 # License
 

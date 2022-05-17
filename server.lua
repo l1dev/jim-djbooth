@@ -1,70 +1,50 @@
 local xSound = exports.xsound
 
-RegisterNetEvent('qb-djbooth:server:playMusic', function(song, zoneName)
+RegisterNetEvent('qb-djbooth:server:playMusic', function(song, zoneNum)
     local src = source
-    local ped = GetPlayerPed(src)
-    local coords = GetEntityCoords(ped)
-    local boothCoords = Config.Locations[zoneName].coords
-    local dist = #(coords - boothCoords)
-    if dist > 3 then return end
-    xSound:PlayUrlPos(-1, zoneName, song, Config.DefaultVolume, coords)
-    xSound:Distance(-1, zoneName, Config.Locations[zoneName].radius)
-    Config.Locations[zoneName].playing = true
-    TriggerClientEvent('qb-djbooth:client:playMusic', src)
+	local Booth = Config.Locations[zoneNum]
+	local zoneLabel = Config.Locations[zoneNum].label..zoneNum
+    xSound:PlayUrlPos(-1, zoneLabel, song, Config.DefaultVolume, GetEntityCoords(GetPlayerPed(src)))
+    xSound:Distance(-1, zoneLabel, Booth.radius)
+    Config.Locations[zoneNum].playing = true
+    TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = zoneNum })
 end)
 
 RegisterNetEvent('qb-djbooth:server:stopMusic', function(data)
     local src = source
-    local ped = GetPlayerPed(src)
-    local coords = GetEntityCoords(ped)
-    local boothCoords = Config.Locations[data.zoneName].coords
-    local dist = #(coords - boothCoords)
-    if dist > 3 then return end
-    if Config.Locations[data.zoneName].playing then
-        Config.Locations[data.zoneName].playing = false
-        xSound:Destroy(-1, data.zoneName)
+	local zoneLabel = Config.Locations[data.zoneNum].label..data.zoneName
+    if Config.Locations[data.zoneNum].playing then
+        Config.Locations[data.zoneNum].playing = false
+        xSound:Destroy(-1, zoneLabel)
     end
-    TriggerClientEvent('qb-djbooth:client:playMusic', src)
+    TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = data.zoneNum })
 end)
 
 RegisterNetEvent('qb-djbooth:server:pauseMusic', function(data)
     local src = source
-    local ped = GetPlayerPed(src)
-    local coords = GetEntityCoords(ped)
-    local boothCoords = Config.Locations[data.zoneName].coords
-    local dist = #(coords - boothCoords)
-    if dist > 3 then return end
-    if Config.Locations[data.zoneName].playing then
-        Config.Locations[data.zoneName].playing = false
-        xSound:Pause(-1, data.zoneName)
+    if Config.Locations[data.zoneNum].playing then
+        Config.Locations[data.zoneNum].playing = false
+        xSound:Pause(-1, zoneLabel)
     end
-    TriggerClientEvent('qb-djbooth:client:playMusic', src)
+    TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = data.zoneNum })
 end)
 
 RegisterNetEvent('qb-djbooth:server:resumeMusic', function(data)
     local src = source
-    local ped = GetPlayerPed(src)
-    local coords = GetEntityCoords(ped)
-    local boothCoords = Config.Locations[data.zoneName].coords
-    local dist = #(coords - boothCoords)
-    if dist > 3 then return end
-    if not Config.Locations[data.zoneName].playing then
-        Config.Locations[data.zoneName].playing = true
-        xSound:Resume(-1, data.zoneName)
+    if not Config.Locations[data.zoneNum].playing then
+        Config.Locations[data.zoneNum].playing = true
+        xSound:Resume(-1, zoneLabel)
     end
-    TriggerClientEvent('qb-djbooth:client:playMusic', src)
+    TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = data.zoneNum })
 end)
 
-RegisterNetEvent('qb-djbooth:server:changeVolume', function(volume, zoneName)
+RegisterNetEvent('qb-djbooth:server:changeVolume', function(volume, zoneNum)
     local src = source
-    local ped = GetPlayerPed(src)
-    local coords = GetEntityCoords(ped)
-    local boothCoords = Config.Locations[zoneName].coords
-    local dist = #(coords - boothCoords)
-    if dist > 3 then return end
+	local Booth = Config.Locations[zoneNum]
+	local zoneLabel = Config.Locations[zoneNum].label..zoneNum
     if not tonumber(volume) then return end
-    if Config.Locations[zoneName].playing then
-        xSound:setVolume(-1, zoneName, volume)
+    if Config.Locations[zoneNum].playing then
+        xSound:setVolume(-1, zoneLabel, volume)
     end
-    TriggerClientEvent('qb-djbooth:client:playMusic', src)
+    TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = zoneNum })
 end)

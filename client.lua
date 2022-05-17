@@ -3,141 +3,43 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local currentZone = nil
 local PlayerData = {}
+local Targets = {}
 
 -- Handlers
+AddEventHandler('onResourceStart', function(r) if (GetCurrentResourceName() ~= r) then return end PlayerData = QBCore.Functions.GetPlayerData() end)
+AddEventHandler('QBCore:Client:OnPlayerLoaded', function() PlayerData = QBCore.Functions.GetPlayerData() end)
+RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo) PlayerData.job = JobInfo end)
+RegisterNetEvent('QBCore:Client:OnPlayerUnload', function() PlayerData = {} end)
 
-AddEventHandler('onResourceStart', function(resourceName)
-	if (GetCurrentResourceName() ~= resourceName) then return end
-	PlayerData = QBCore.Functions.GetPlayerData()
+CreateThread(function()
+	for i = 1, #Config.Locations do
+		if Config.Locations[i].enableBooth then
+			Targets["Booth"..i] =
+			exports['qb-target']:AddCircleZone("Booth"..i, Config.Locations[i].coords, 0.6, {name="Booth"..i, debugPoly=Config.Debug, useZ=true, },
+				{ options = { { event = "qb-djbooth:client:playMusic", icon = "fab fa-youtube", label = "DJ Booth", job = Config.Locations[i].job, zone = i, }, }, distance = 2.0 })
+		end
+	end
 end)
 
-AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
-    PlayerData = QBCore.Functions.GetPlayerData()
+RegisterNetEvent("qb-djbooth:client:playMusic", function(data)
+	exports["qb-menu"]:openMenu({ 
+		{ isMenuHeader = true, header = '<img src=https://cdn-icons-png.flaticon.com/512/1384/1384060.png width=20px></img>&nbsp; DJ Booth' },
+		{ icon = "fas fa-circle-xmark", header = "", txt = "Close", params = { event = "qb-menu:client:closemenu" } },
+		{ icon = "fab fa-youtube", header = "Play a song", txt = "Enter a youtube URL", params = { event = "qb-djbooth:client:musicMenu", args = { zoneNum = data.zone } } },
+		{ icon = "fas fa-pause", header = "Pause Music", txt = "Pause music", params = { isServer = true, event = "qb-djbooth:server:pauseMusic", args = { zoneNum = data.zone } } },
+		{ icon = "fas fa-play", header = "Resume Music", txt = "Resume music", params = { isServer = true, event = "qb-djbooth:server:resumeMusic", args = { zoneNum = data.zone } } },
+		{ icon = "fas fa-volume-off", header = "Volume", txt = "Change volume", params = { event = "qb-djbooth:client:changeVolume", args = { zoneNum = data.zone } } },
+		{ icon = "fas fa-stop", header = "Turn off music", txt = "Stop the music & choose a new song", params = { isServer = true, event = "qb-djbooth:server:stopMusic", args = { zoneNum = data.zone } } } })
 end)
 
-RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
-    PlayerData.job = JobInfo
-end)
-
-RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
-    PlayerData = {}
-end)
-
--- Static Header
-
-local musicHeader = {
-    {
-        header = 'Play some music!',
-        params = {
-            event = 'qb-djbooth:client:playMusic'
-        }
-    }
-}
-
--- Main Menu
-
-function createMusicMenu()
-    musicMenu = {
-        {
-            isHeader = true,
-            header = '💿 | DJ Booth'
-        },
-        {
-            header = '🎶 | Play a song',
-            txt = 'Enter a youtube URL',
-            params = {
-                event = 'qb-djbooth:client:musicMenu',
-                args = {
-                    zoneName = currentZone
-                }
-            }
-        },
-        {
-            header = '⏸️ | Pause Music',
-            txt = 'Pause currently playing music',
-            params = {
-                isServer = true,
-                event = 'qb-djbooth:server:pauseMusic',
-                args = {
-                    zoneName = currentZone
-                }
-            }
-        },
-        {
-            header = '▶️ | Resume Music',
-            txt = 'Resume playing paused music',
-            params = {
-                isServer = true,
-                event = 'qb-djbooth:server:resumeMusic',
-                args = {
-                    zoneName = currentZone
-                }
-            }
-        },
-        {
-            header = '🔈 | Change Volume',
-            txt = 'Resume playing paused music',
-            params = {
-                event = 'qb-djbooth:client:changeVolume',
-                args = {
-                    zoneName = currentZone
-                }
-            }
-        },
-        {
-            header = '❌ | Turn off music',
-            txt = 'Stop the music & choose a new song',
-            params = {
-                isServer = true,
-                event = 'qb-djbooth:server:stopMusic',
-                args = {
-                    zoneName = currentZone
-                }
-            }
-        }
-    }
-end
-
--- DJ Booths
-
-local vanilla = BoxZone:Create(Config.Locations['vanilla'].coords, 1, 1, {
-    name="vanilla",
-    heading=0
-})
-
-vanilla:onPlayerInOut(function(isPointInside)
-    if isPointInside and PlayerData.job.name == Config.Locations['vanilla'].job then
-        currentZone = 'vanilla'
-        exports['qb-menu']:showHeader(musicHeader)
-    else
-        currentZone = nil
-        exports['qb-menu']:closeMenu()
-    end
-end)
-
--- Events
-
-RegisterNetEvent('qb-djbooth:client:playMusic', function()
-    createMusicMenu()
-    exports['qb-menu']:openMenu(musicMenu)
-end)
-
-RegisterNetEvent('qb-djbooth:client:musicMenu', function()
+RegisterNetEvent('qb-djbooth:client:musicMenu', function(data)
     local dialog = exports['qb-input']:ShowInput({
         header = 'Song Selection',
         submitText = "Submit",
-        inputs = {
-            {
-                type = 'text',
-                isRequired = true,
-                name = 'song',
-                text = 'YouTube URL'
-            }
-        }
-    })
+        inputs = { { type = 'text', isRequired = true, name = 'song', text = 'YouTube URL' } } })
     if dialog then
         if not dialog.song then return end
-        TriggerServerEvent('qb-djbooth:server:playMusic', dialog.song, currentZone)
+        TriggerServerEvent('qb-djbooth:server:playMusic', dialog.song, data.zoneNum)
     end
 end)
 
@@ -145,17 +47,14 @@ RegisterNetEvent('qb-djbooth:client:changeVolume', function()
     local dialog = exports['qb-input']:ShowInput({
         header = 'Music Volume',
         submitText = "Submit",
-        inputs = {
-            {
-                type = 'text', -- number doesn't accept decimals??
-                isRequired = true,
-                name = 'volume',
-                text = 'Min: 0.01 - Max: 1'
-            }
-        }
-    })
+        inputs = { { type = 'text', isRequired = true,  name = 'volume', text = 'Min: 0.01 - Max: 1' } } })
     if dialog then
         if not dialog.volume then return end
-        TriggerServerEvent('qb-djbooth:server:changeVolume', dialog.volume, currentZone)
+        TriggerServerEvent('qb-djbooth:server:changeVolume', dialog.volume, data.zoneNum)
     end
+end)
+
+AddEventHandler('onResourceStop', function(r) 
+	if r ~= GetCurrentResourceName() then return end
+	for k, v in pairs(Targets) do exports['qb-target']:RemoveZone(k) end
 end)
