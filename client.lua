@@ -2,6 +2,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 local PlayerData = {}
 local Targets = {}
 local xSound = exports.xsound
+local Props = {}
 
 AddEventHandler('onResourceStart', function(r) if (GetCurrentResourceName() ~= r) then return end PlayerData = QBCore.Functions.GetPlayerData() end)
 AddEventHandler('QBCore:Client:OnPlayerLoaded', function() PlayerData = QBCore.Functions.GetPlayerData() end)
@@ -11,9 +12,17 @@ RegisterNetEvent('QBCore:Client:OnPlayerUnload', function() PlayerData = {} end)
 CreateThread(function()
 	for i = 1, #Config.Locations do
 		if Config.Locations[i].enableBooth then
+			local RequireJob = Config.Locations[i].job 
+			if RequireJob == "public" then RequireJob = nil end
 			Targets["Booth"..i] =
 			exports['qb-target']:AddCircleZone("Booth"..i, Config.Locations[i].coords, 0.6, {name="Booth"..i, debugPoly=Config.Debug, useZ=true, },
-				{ options = { { event = "qb-djbooth:client:playMusic", icon = "fab fa-youtube", label = "DJ Booth", job = Config.Locations[i].job, zone = i, }, }, distance = 2.0 })
+				{ options = { { event = "qb-djbooth:client:playMusic", icon = "fab fa-youtube", label = "DJ Booth", job = RequireJob, zone = i, }, }, distance = 2.0 })
+			if Config.Locations[i].prop then
+				RequestModel(Config.Locations[i].prop) while not HasModelLoaded(Config.Locations[i].prop) do Citizen.Wait(1) end
+				Props[#Props+1] = CreateObject(Config.Locations[i].prop, Config.Locations[i].coords,false,false,false)
+				SetEntityHeading(Props[#Props], math.random(1,359)+0.0)
+				FreezeEntityPosition(Props[#Props], true)
+			end
 		end
 	end
 end)
@@ -53,7 +62,6 @@ RegisterNetEvent("qb-djbooth:client:playMusic", function(data)
 			if xSound:isPlaying(booth) then song.timeStamp = "🔊 "..song.timeStamp else song.timeStamp = "🔇 "..song.timeStamp end
 		end
 	end
-
 	
 	local musicMenu = {}
 	musicMenu[#musicMenu+1] = { isMenuHeader = true, header = '<img src=https://cdn-icons-png.flaticon.com/512/1384/1384060.png width=20px></img>&nbsp; DJ Booth', txt = "" }
@@ -61,7 +69,7 @@ RegisterNetEvent("qb-djbooth:client:playMusic", function(data)
 	musicMenu[#musicMenu+1] = { icon = "fas fa-circle-xmark", header = "", txt = "Close", params = { event = "qb-menu:client:closemenu" } }
 	musicMenu[#musicMenu+1] = { icon = "fab fa-youtube", header = "Play a song", txt = "Enter a youtube URL", params = { event = "qb-djbooth:client:musicMenu", args = { zoneNum = data.zone } } }
 	if previousSongs[booth] then 
-		musicMenu[#musicMenu+1] = { icon = "fas fa-clock-rotate-left", header = "Song History", txt = "View previous songs", params = { event = "qb-djbooth:client:history", args = { history = previousSongs[(PlayerData.job.name..data.zone)], zoneNum = data.zone } } }
+		musicMenu[#musicMenu+1] = { icon = "fas fa-clock-rotate-left", header = "Song History", txt = "View previous songs", params = { event = "qb-djbooth:client:history", args = { history = previousSongs[booth], zoneNum = data.zone } } }
 	end
 	if xSound:soundExists(booth) then
 		if xSound:isPlaying(booth) then
@@ -122,4 +130,5 @@ end)
 AddEventHandler('onResourceStop', function(r) 
 	if r ~= GetCurrentResourceName() then return end
 	for k, v in pairs(Targets) do exports['qb-target']:RemoveZone(k) end
+	for i = 1, #Props do DeleteEntity(Props[i]) end
 end)
