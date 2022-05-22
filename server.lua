@@ -2,9 +2,11 @@ local QBCore = exports['qb-core']:GetCoreObject()
 
 local xSound = exports.xsound
 previousSongs = {}
+CurrentBooths = {}
 
 RegisterNetEvent('qb-djbooth:server:playMusic', function(song, zoneNum)
     local src = source
+	local coords = GetEntityCoords(ped)
 	local Booth = Config.Locations[zoneNum]
 	local zoneLabel = Config.Locations[zoneNum].job..zoneNum
 	if not previousSongs[zoneLabel] then previousSongs[zoneLabel] = { [1] = song, }
@@ -15,7 +17,10 @@ RegisterNetEvent('qb-djbooth:server:playMusic', function(song, zoneNum)
 			previousSongs[zoneLabel] = songList
 		--end
 	end
-    xSound:PlayUrlPos(-1, zoneLabel, song, Booth.DefaultVolume, GetEntityCoords(GetPlayerPed(src)))
+	if Config.Locations[zoneNum].soundLoc then -- If soundLoc is found, change the location of the music
+		coords = Config.Locations[zoneNum].soundLoc
+	end
+    xSound:PlayUrlPos(-1, zoneLabel, song, Booth.DefaultVolume, coords)
     xSound:Distance(-1, zoneLabel, Booth.radius)
     Config.Locations[zoneNum].playing = true
     TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = zoneNum })

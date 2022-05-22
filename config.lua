@@ -17,10 +17,11 @@ Config = {
 			DefaultVolume = 0.15,
 			radius = 200,
 			coords = vector3(206.9, 1181.04, 226.51),
+			soundLoc = vector3(212.32, 1155.87, 227.01), -- Add sound origin location if you don't want the music to play from the dj booth
 			playing = false, -- don't touch
 		},
 		[3] = { -- Henhouse (smokeys MLO coords)
-			job = "public",
+			job = "henhouse",
 			enableBooth = true,
 			DefaultVolume = 0.1,
 			radius = 30,
