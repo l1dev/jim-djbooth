@@ -17,10 +17,11 @@ RegisterNetEvent('qb-djbooth:server:playMusic', function(song, zoneNum)
 			previousSongs[zoneLabel] = songList
 		--end
 	end
-	if Config.Locations[zoneNum].soundLoc then -- If soundLoc is found, change the location of the music
-		coords = Config.Locations[zoneNum].soundLoc
+	local bCoords = Booth.coords
+	if Booth.soundLoc then -- If soundLoc is found, change the location of the music
+		bcoords = Booth.soundLoc
 	end
-    xSound:PlayUrlPos(-1, zoneLabel, song, Booth.DefaultVolume, coords)
+    xSound:PlayUrlPos(-1, zoneLabel, song, Booth.DefaultVolume, bCoords)
     xSound:Distance(-1, zoneLabel, Booth.radius)
     Config.Locations[zoneNum].playing = true
     TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = zoneNum })
