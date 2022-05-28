@@ -70,12 +70,18 @@ end)
 
 QBCore.Functions.CreateCallback('qb-djbooth:songInfo', function(source, cb) cb(previousSongs) end)
 
-AddEventHandler('onResourceStop', function(resource)
-    if resource ~= GetCurrentResourceName() then return end
+-- I was asked about adding support for a city blackout script
+-- This is for that
+RegisterNetEvent("qb-djbooth:server:DestoryAll", function()
 	for i = 1, #Config.Locations do
 		if Config.Locations[i].playing then
 			local zoneLabel = Config.Locations[i].job..i
 			xSound:Destroy(-1, zoneLabel)
 		end
 	end
+end)
+
+AddEventHandler('onResourceStop', function(resource)
+    if resource ~= GetCurrentResourceName() then return end
+	TriggerEvent("qb-djbooth:server:DestoryAll")
 end)
