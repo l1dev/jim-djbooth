@@ -1,4 +1,4 @@
-print("QB-DJBooth edit by Jimathy")
+print("QB-DJBooth v1.1 by Jimathy")
 
 Config = {
 	Debug = false, -- Set to true to show target locations
@@ -53,8 +53,16 @@ Config = {
 			radius = 30,
 			coords = vector3(1595.53, 6453.02, 26.165),
 			playing = false, -- don't touch
-			prop = `prop_boombox_01` -- Prop to spawn at location, if the location doesn't have one already
-								     -- (can be changed to any prop, coords determine wether its placed correctly)
+			prop = `prop_boombox_01`
+		},
+		[7] = { -- LostMC compound next to Casino
+			gang = "lostmc",
+			enableBooth = true,
+			DefaultVolume = 0.1,
+			radius = 20,
+			coords = vector3(983.14, -133.17, 79.59),
+			soundLoc = vector3(988.79, -131.62, 78.89), -- Add sound origin location if you don't want the music to play from the dj booth
+			playing = false, -- don't touch
 		},
 	},
 }

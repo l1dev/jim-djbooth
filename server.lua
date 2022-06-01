@@ -8,7 +8,9 @@ RegisterNetEvent('qb-djbooth:server:playMusic', function(song, zoneNum)
     local src = source
 	local coords = GetEntityCoords(ped)
 	local Booth = Config.Locations[zoneNum]
-	local zoneLabel = Config.Locations[zoneNum].job..zoneNum
+	local zoneLabel = ""
+	if Booth.job then zoneLabel = Config.Locations[zoneNum].job..zoneNum
+	elseif Booth.gang then zoneLabel = Config.Locations[zoneNum].gang..zoneNum end
 	if not previousSongs[zoneLabel] then previousSongs[zoneLabel] = { [1] = song, }
 	elseif previousSongs[zoneLabel] then
 		local songList = previousSongs[zoneLabel]
@@ -29,7 +31,9 @@ end)
 
 RegisterNetEvent('qb-djbooth:server:stopMusic', function(data)
     local src = source
-	local zoneLabel = Config.Locations[data.zoneNum].job..data.zoneNum
+	local zoneLabel = ""
+	if Config.Locations[data.zoneNum].job then zoneLabel = Config.Locations[data.zoneNum].job..data.zoneNum
+	elseif Config.Locations[data.zoneNum].gang then zoneLabel = Config.Locations[data.zoneNum].gang..data.zoneNum end
     if Config.Locations[data.zoneNum].playing then
         Config.Locations[data.zoneNum].playing = false
         xSound:Destroy(-1, zoneLabel)
@@ -39,7 +43,9 @@ end)
 
 RegisterNetEvent('qb-djbooth:server:pauseMusic', function(data)
     local src = source
-	local zoneLabel = Config.Locations[data.zoneNum].job..data.zoneNum
+	local zoneLabel = ""
+	if Config.Locations[data.zoneNum].job then zoneLabel = Config.Locations[data.zoneNum].job..data.zoneNum
+	elseif Config.Locations[data.zoneNum].gang then zoneLabel = Config.Locations[data.zoneNum].gang..data.zoneNum end
     if Config.Locations[data.zoneNum].playing then
         Config.Locations[data.zoneNum].playing = false
         xSound:Pause(-1, zoneLabel)
@@ -49,7 +55,9 @@ end)
 
 RegisterNetEvent('qb-djbooth:server:resumeMusic', function(data)
     local src = source
-	local zoneLabel = Config.Locations[data.zoneNum].job..data.zoneNum
+	local zoneLabel = ""
+	if Config.Locations[data.zoneNum].job then zoneLabel = Config.Locations[data.zoneNum].job..data.zoneNum
+	elseif Config.Locations[data.zoneNum].gang then zoneLabel = Config.Locations[data.zoneNum].gang..data.zoneNum end
     if not Config.Locations[data.zoneNum].playing then
         Config.Locations[data.zoneNum].playing = true
         xSound:Resume(-1, zoneLabel)
@@ -59,8 +67,9 @@ end)
 
 RegisterNetEvent('qb-djbooth:server:changeVolume', function(volume, zoneNum)
     local src = source
-	local Booth = Config.Locations[zoneNum]
-	local zoneLabel = Config.Locations[zoneNum].job..zoneNum
+	local zoneLabel = ""
+	if Config.Locations[zoneNum].job then zoneLabel = Config.Locations[zoneNum].job..zoneNum
+	elseif Config.Locations[zoneNum].gang then zoneLabel = Config.Locations[zoneNum].gang..zoneNum end
     if not tonumber(volume) then return end
     if Config.Locations[zoneNum].playing then
         xSound:setVolume(-1, zoneLabel, volume)
@@ -75,7 +84,9 @@ QBCore.Functions.CreateCallback('qb-djbooth:songInfo', function(source, cb) cb(p
 RegisterNetEvent("qb-djbooth:server:DestoryAll", function()
 	for i = 1, #Config.Locations do
 		if Config.Locations[i].playing then
-			local zoneLabel = Config.Locations[i].job..i
+			local zoneLabel = ""
+			if Config.Locations[i].job then zoneLabel = Config.Locations[i].job..i
+			elseif Config.Locations[i].gang then zoneLabel = Config.Locations[i].gang..i end
 			xSound:Destroy(-1, zoneLabel)
 		end
 	end

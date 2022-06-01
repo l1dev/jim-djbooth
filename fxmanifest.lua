@@ -1,10 +1,9 @@
-fx_version 'cerulean'
-game 'gta5'
-
-description 'QB-DJBOOTH'
-version '1.0.0'
-
-shared_script 'config.lua'
+name "QB-DJBooth"
+author "Jimathy"
+version "v1.1"
+description 'QB-DJBooth Edit By Jimathy'
+fx_version "cerulean"
+game "gta5"
 
 client_scripts {
     '@PolyZone/client.lua',
@@ -15,7 +14,8 @@ client_scripts {
     'client.lua'
 }
 
-server_script 'server.lua'
+shared_script { 'config.lua' }
+server_script { 'server.lua' }
 
 dependency 'xsound'
 

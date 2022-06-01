@@ -12,11 +12,18 @@ RegisterNetEvent('QBCore:Client:OnPlayerUnload', function() PlayerData = {} end)
 CreateThread(function()
 	for i = 1, #Config.Locations do
 		if Config.Locations[i].enableBooth then
-			local RequireJob = Config.Locations[i].job 
-			if RequireJob == "public" then RequireJob = nil end
+			local RequireJob = nil
+			local RequireGang = nil
+			if Config.Locations[i].job then
+				RequireJob = Config.Locations[i].job
+				if RequireJob == "public" then RequireJob = nil end
+			end
+			if Config.Locations[i].gang then
+				RequireGang = Config.Locations[i].RequireGang
+			end
 			Targets["Booth"..i] =
 			exports['qb-target']:AddCircleZone("Booth"..i, Config.Locations[i].coords, 0.6, {name="Booth"..i, debugPoly=Config.Debug, useZ=true, },
-				{ options = { { event = "qb-djbooth:client:playMusic", icon = "fab fa-youtube", label = "DJ Booth", job = RequireJob, zone = i, }, }, distance = 2.0 })
+				{ options = { { event = "qb-djbooth:client:playMusic", icon = "fab fa-youtube", label = "DJ Booth", job = RequireJob, gang = RequireGang, zone = i, }, }, distance = 2.0 })
 			if Config.Locations[i].prop then
 				RequestModel(Config.Locations[i].prop) while not HasModelLoaded(Config.Locations[i].prop) do Citizen.Wait(1) end
 				Props[#Props+1] = CreateObject(Config.Locations[i].prop, Config.Locations[i].coords,false,false,false)
@@ -29,7 +36,11 @@ end)
 
 RegisterNetEvent("qb-djbooth:client:playMusic", function(data)
 	local booth = ""
-	for k, v in pairs(Config.Locations) do if #(GetEntityCoords(PlayerPedId()) - v["coords"]) <= v["radius"] then booth = v["job"]..k end end
+	for k, v in pairs(Config.Locations) do
+		if #(GetEntityCoords(PlayerPedId()) - v["coords"]) <= v["radius"] then
+			if v["job"] then booth = v["job"]..k elseif v["gang"] then booth = v["gang"]..k end
+		end
+	end
 	local song = { playing = "", duration = "", timeStamp = "",	duration = "", url = "", icon = "", header = "", txt = "🔇 No Song Playing", volume = "" }		
 	local p = promise.new()
 	QBCore.Functions.TriggerCallback('qb-djbooth:songInfo', function(cb) p:resolve(cb)end)
@@ -127,8 +138,7 @@ RegisterNetEvent('qb-djbooth:client:changeVolume', function(data)
     end
 end)
 
-AddEventHandler('onResourceStop', function(r) 
-	if r ~= GetCurrentResourceName() then return end
+AddEventHandler('onResourceStop', function(r) if r ~= GetCurrentResourceName() then return end
 	for k, v in pairs(Targets) do exports['qb-target']:RemoveZone(k) end
 	for i = 1, #Props do DeleteEntity(Props[i]) end
 end)
