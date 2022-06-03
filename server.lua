@@ -23,7 +23,9 @@ RegisterNetEvent('qb-djbooth:server:playMusic', function(song, zoneNum)
 	if Booth.soundLoc then -- If soundLoc is found, change the location of the music
 		bcoords = Booth.soundLoc
 	end
-    xSound:PlayUrlPos(-1, zoneLabel, song, Booth.DefaultVolume, bCoords)
+	local vol = Booth.DefaultVolume
+	if Booth.CurrentVolume then vol = Booth.CurrentVolume end
+    xSound:PlayUrlPos(-1, zoneLabel, song, vol, bCoords)
     xSound:Distance(-1, zoneLabel, Booth.radius)
     Config.Locations[zoneNum].playing = true
     TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = zoneNum })
@@ -35,7 +37,8 @@ RegisterNetEvent('qb-djbooth:server:stopMusic', function(data)
 	if Config.Locations[data.zoneNum].job then zoneLabel = Config.Locations[data.zoneNum].job..data.zoneNum
 	elseif Config.Locations[data.zoneNum].gang then zoneLabel = Config.Locations[data.zoneNum].gang..data.zoneNum end
     if Config.Locations[data.zoneNum].playing then
-        Config.Locations[data.zoneNum].playing = false
+        Config.Locations[data.zoneNum].playing = nil
+        Config.Locations[data.zoneNum].CurrentVolume = nil
         xSound:Destroy(-1, zoneLabel)
     end
     TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = data.zoneNum })
@@ -47,7 +50,7 @@ RegisterNetEvent('qb-djbooth:server:pauseMusic', function(data)
 	if Config.Locations[data.zoneNum].job then zoneLabel = Config.Locations[data.zoneNum].job..data.zoneNum
 	elseif Config.Locations[data.zoneNum].gang then zoneLabel = Config.Locations[data.zoneNum].gang..data.zoneNum end
     if Config.Locations[data.zoneNum].playing then
-        Config.Locations[data.zoneNum].playing = false
+        Config.Locations[data.zoneNum].playing = nil
         xSound:Pause(-1, zoneLabel)
     end
     TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = data.zoneNum })
@@ -73,6 +76,7 @@ RegisterNetEvent('qb-djbooth:server:changeVolume', function(volume, zoneNum)
     if not tonumber(volume) then return end
     if Config.Locations[zoneNum].playing then
         xSound:setVolume(-1, zoneLabel, volume)
+		Config.Locations[zoneNum].CurrentVolume = volume
     end
     TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = zoneNum })
 end)
