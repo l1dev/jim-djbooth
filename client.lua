@@ -41,11 +41,11 @@ RegisterNetEvent("qb-djbooth:client:playMusic", function(data)
 			if v["job"] then booth = v["job"]..k elseif v["gang"] then booth = v["gang"]..k end
 		end
 	end
-	local song = { playing = "", duration = "", timeStamp = "",	duration = "", url = "", icon = "", header = "", txt = "🔇 No Song Playing", volume = "" }		
+	local song = { playing = "", duration = "", timeStamp = "",	duration = "", url = "", icon = "", header = "", txt = "🔇 No Song Playing", volume = "" }
 	local p = promise.new()
-	QBCore.Functions.TriggerCallback('qb-djbooth:songInfo', function(cb) p:resolve(cb)end)
+	QBCore.Functions.TriggerCallback('qb-djbooth:songInfo', function(cb) p:resolve(cb) end)
 	previousSongs = Citizen.Await(p)
-	
+
 	-- Grab song info and build table
 	if xSound:soundExists(booth) then
 		song = {
@@ -63,7 +63,7 @@ RegisterNetEvent("qb-djbooth:client:playMusic", function(data)
 		if xSound:getMaxDuration(booth) > 0 then
 			local timestamp = (xSound:getTimeStamp(booth) * 10)
 			local mm = (timestamp // (60 * 10)) % 60.
-			local ss = (timestamp // 10) % 60.			
+			local ss = (timestamp // 10) % 60.
 			timestamp = string.format("%02d:%02d", mm, ss)
 			local duration = (xSound:getMaxDuration(booth) * 10)
 			mm = (duration // (60 * 10)) % 60.
@@ -73,13 +73,13 @@ RegisterNetEvent("qb-djbooth:client:playMusic", function(data)
 			if xSound:isPlaying(booth) then song.timeStamp = "🔊 "..song.timeStamp else song.timeStamp = "🔇 "..song.timeStamp end
 		end
 	end
-	
+
 	local musicMenu = {}
 	musicMenu[#musicMenu+1] = { isMenuHeader = true, header = '<img src=https://cdn-icons-png.flaticon.com/512/1384/1384060.png width=20px></img>&nbsp; DJ Booth', txt = "" }
 	musicMenu[#musicMenu+1] = { isMenuHeader = true, icon = song.icon, header = song.header, txt = song.txt.."<br>"..song.timeStamp }
 	musicMenu[#musicMenu+1] = { icon = "fas fa-circle-xmark", header = "", txt = "Close", params = { event = "qb-menu:client:closemenu" } }
 	musicMenu[#musicMenu+1] = { icon = "fab fa-youtube", header = "Play a song", txt = "Enter a youtube URL", params = { event = "qb-djbooth:client:musicMenu", args = { zoneNum = data.zone } } }
-	if previousSongs[booth] then 
+	if previousSongs[booth] then
 		musicMenu[#musicMenu+1] = { icon = "fas fa-clock-rotate-left", header = "Song History", txt = "View previous songs", params = { event = "qb-djbooth:client:history", args = { history = previousSongs[booth], zoneNum = data.zone } } }
 	end
 	if xSound:soundExists(booth) then
@@ -139,6 +139,6 @@ RegisterNetEvent('qb-djbooth:client:changeVolume', function(data)
 end)
 
 AddEventHandler('onResourceStop', function(r) if r ~= GetCurrentResourceName() then return end
-	for k, v in pairs(Targets) do exports['qb-target']:RemoveZone(k) end
+	for k in pairs(Targets) do exports['qb-target']:RemoveZone(k) end
 	for i = 1, #Props do DeleteEntity(Props[i]) end
 end)
