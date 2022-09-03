@@ -11,10 +11,11 @@ client_scripts {
     '@PolyZone/EntityZone.lua',
     '@PolyZone/CircleZone.lua',
     '@PolyZone/ComboZone.lua',
-    'client.lua'
+    'client.lua',
+    'locales/*.lua'
 }
 
-shared_script { 'config.lua' }
+shared_script { 'config.lua', 'locales/*.lua' }
 server_script { 'server.lua' }
 
 dependency 'xsound'
