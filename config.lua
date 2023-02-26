@@ -1,8 +1,13 @@
-print("QB-DJBooth v1.1 by Jimathy")
+print("^2Jim^7-^2DJBooth ^7v^41^7.^42 ^2by ^1Jimathy^7")
 
 Config = {
 	Lan = "en",
-	Debug = false, -- Set to true to show target locations
+	Debug = true, -- Set to true to show target locations
+
+	Core = "qb-core",
+	Menu = "ox",
+	Notify = "ox",
+
 	Locations = {
 		{ -- Vanilla Unicorn DJ Booth
 			job = "vanilla", -- Set this to required job role
@@ -39,8 +44,8 @@ Config = {
 			DefaultVolume = 0.1,
 			radius = 30,
 			coords = vector3(127.04, -3030.65, 6.80),
-			prop = `prop_radio_01` -- Prop to spawn at location, if the location doesn't have one already
-								   -- (can be changed to any prop, coords determine wether its placed correctly)
+			prop = `prop_radio_01`	-- Prop to spawn at location, if the location doesn't have one already
+									-- (can be changed to any prop, coords determine wether its placed correctly)
 		},
 		{ -- Gabz Popsdiner Radio Prop
 			job = "public",

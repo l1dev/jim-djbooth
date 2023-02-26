@@ -1,102 +1,67 @@
-local QBCore = exports['qb-core']:GetCoreObject()
+local QBCore = exports[Config.Core]:GetCoreObject()
 
 local xSound = exports.xsound
-previousSongs = {}
-CurrentBooths = {}
+previousSongs, CurrentBooths = {}, {}
 
-RegisterNetEvent('qb-djbooth:server:playMusic', function(song, zoneNum)
-    local src = source
-	local coords = GetEntityCoords(ped)
-	local Booth = Config.Locations[zoneNum]
-	local zoneLabel = ""
-	if Booth.job then zoneLabel = Config.Locations[zoneNum].job..zoneNum
-	elseif Booth.gang then zoneLabel = Config.Locations[zoneNum].gang..zoneNum end
+RegisterNetEvent('jim-djbooth:server:playMusic', function(song, zoneNum)
+    local src, coords, Booth = source, GetEntityCoords(ped), Config.Locations[zoneNum]
+	local zoneLabel = ""..(Booth.gang or Booth.job)..zoneNum
 	if not previousSongs[zoneLabel] then previousSongs[zoneLabel] = { [1] = song, }
 	elseif previousSongs[zoneLabel] then
 		local songList = previousSongs[zoneLabel]
-		--if not songList[#songList] == song then --Stopped adding NEW links to the list so disabled for now..
-			songList[#songList+1] = song
-			previousSongs[zoneLabel] = songList
-		--end
+		songList[#songList+1] = song
+		previousSongs[zoneLabel] = songList
 	end
-	local bCoords = Booth.coords
-	if Booth.soundLoc then -- If soundLoc is found, change the location of the music
-		bcoords = Booth.soundLoc
-	end
-	local vol = Booth.DefaultVolume
-	if Booth.CurrentVolume then vol = Booth.CurrentVolume end
-    xSound:PlayUrlPos(-1, zoneLabel, song, vol, bCoords)
-    xSound:Distance(-1, zoneLabel, Booth.radius)
-    Config.Locations[zoneNum].playing = true
-    TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = zoneNum })
+	xSound:PlayUrlPos(-1, zoneLabel, song, (Booth.CurrentVolume or Booth.DefaultVolume), (Booth.soundLoc or Booth.coords))
+	xSound:Distance(-1, zoneLabel, Booth.radius)
+	Config.Locations[zoneNum].playing = true
+	TriggerClientEvent('jim-djbooth:client:playMusic', src, { zoneNum = zoneNum })
 end)
 
-RegisterNetEvent('qb-djbooth:server:stopMusic', function(data)
-    local src = source
-	local zoneLabel = ""
-	if Config.Locations[data.zoneNum].job then zoneLabel = Config.Locations[data.zoneNum].job..data.zoneNum
-	elseif Config.Locations[data.zoneNum].gang then zoneLabel = Config.Locations[data.zoneNum].gang..data.zoneNum end
-    if Config.Locations[data.zoneNum].playing then
-        Config.Locations[data.zoneNum].playing = nil
-        Config.Locations[data.zoneNum].CurrentVolume = nil
-        xSound:Destroy(-1, zoneLabel)
-    end
-    TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = data.zoneNum })
+RegisterNetEvent('jim-djbooth:server:stopMusic', function(data)
+    local src, Booth = source, Config.Locations[data.zoneNum]
+	local zoneLabel = ""..(Booth.gang or Booth.job)..data.zoneNum
+    if Booth.playing then Config.Locations[data.zoneNum].playing = nil Config.Locations[data.zoneNum].CurrentVolume = nil xSound:Destroy(-1, zoneLabel) end
+    TriggerClientEvent('jim-djbooth:client:playMusic', src, { zoneNum = data.zoneNum })
 end)
 
-RegisterNetEvent('qb-djbooth:server:pauseMusic', function(data)
-    local src = source
-	local zoneLabel = ""
-	if Config.Locations[data.zoneNum].job then zoneLabel = Config.Locations[data.zoneNum].job..data.zoneNum
-	elseif Config.Locations[data.zoneNum].gang then zoneLabel = Config.Locations[data.zoneNum].gang..data.zoneNum end
-    if Config.Locations[data.zoneNum].playing then
-        Config.Locations[data.zoneNum].playing = nil
-        xSound:Pause(-1, zoneLabel)
-    end
-    TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = data.zoneNum })
+RegisterNetEvent("jim-djbooth:server:PauseResume", function(data)
+    local src, Booth = source, Config.Locations[data.zoneNum]
+	local zoneLabel = ""..(Booth.gang or Booth.job)..data.zoneNum
+	if Booth.playing then Booth.playing = nil xSound:Pause(-1, zoneLabel)
+	elseif not Config.Locations[data.zoneNum].playing then Config.Locations[data.zoneNum].playing = true xSound:Resume(-1, zoneLabel) end
+    TriggerClientEvent('jim-djbooth:client:playMusic', src, { zoneNum = data.zoneNum })
 end)
 
-RegisterNetEvent('qb-djbooth:server:resumeMusic', function(data)
-    local src = source
-	local zoneLabel = ""
-	if Config.Locations[data.zoneNum].job then zoneLabel = Config.Locations[data.zoneNum].job..data.zoneNum
-	elseif Config.Locations[data.zoneNum].gang then zoneLabel = Config.Locations[data.zoneNum].gang..data.zoneNum end
-    if not Config.Locations[data.zoneNum].playing then
-        Config.Locations[data.zoneNum].playing = true
-        xSound:Resume(-1, zoneLabel)
-    end
-    TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = data.zoneNum })
-end)
-
-RegisterNetEvent('qb-djbooth:server:changeVolume', function(volume, zoneNum)
-    local src = source
-	local zoneLabel = ""
-	if Config.Locations[zoneNum].job then zoneLabel = Config.Locations[zoneNum].job..zoneNum
-	elseif Config.Locations[zoneNum].gang then zoneLabel = Config.Locations[zoneNum].gang..zoneNum end
+RegisterNetEvent('jim-djbooth:server:changeVolume', function(volume, zoneNum)
+    local src, Booth = source, Config.Locations[zoneNum]
+	local zoneLabel = ""..(Booth.gang or Booth.job)..zoneNum
     if not tonumber(volume) then return end
-    if Config.Locations[zoneNum].playing then
-        xSound:setVolume(-1, zoneLabel, volume)
-		Config.Locations[zoneNum].CurrentVolume = volume
-    end
-    TriggerClientEvent('qb-djbooth:client:playMusic', src, { zone = zoneNum })
+    if Booth.playing then xSound:setVolume(-1, zoneLabel, volume) Config.Locations[zoneNum].CurrentVolume = volume end
+    TriggerClientEvent('jim-djbooth:client:playMusic', src, { zoneNum = zoneNum })
 end)
 
-QBCore.Functions.CreateCallback('qb-djbooth:songInfo', function(source, cb) cb(previousSongs) end)
+QBCore.Functions.CreateCallback('jim-djbooth:songInfo', function(source, cb) cb(previousSongs) end)
 
 -- I was asked about adding support for a city blackout script
 -- This is for that
-RegisterNetEvent("qb-djbooth:server:DestoryAll", function()
+local function DestroyAll()
 	for i = 1, #Config.Locations do
-		if Config.Locations[i].playing then
-			local zoneLabel = ""
-			if Config.Locations[i].job then zoneLabel = Config.Locations[i].job..i
-			elseif Config.Locations[i].gang then zoneLabel = Config.Locations[i].gang..i end
-			xSound:Destroy(-1, zoneLabel)
-		end
+		local Booth = Config.Locations[i]
+		if Booth.playing then local zoneLabel = ""..(Booth.gang or Booth.job)..i xSound:Destroy(-1, zoneLabel) end
 	end
-end)
+end
 
-AddEventHandler('onResourceStop', function(resource)
-    if resource ~= GetCurrentResourceName() then return end
-	TriggerEvent("qb-djbooth:server:DestoryAll")
-end)
+AddEventHandler('onResourceStop', function(r) if r ~= GetCurrentResourceName() then return end DestroyAll() end)
+
+local function CheckVersion()
+	PerformHttpRequest('https://raw.githubusercontent.com/jimathy/jim-djbooth/master/version.txt', function(err, newestVersion, headers)
+		local currentVersion = GetResourceMetadata(GetCurrentResourceName(), 'version')
+		if not newestVersion then print("Currently unable to run a version check.") return end
+		local advice = "^1You are currently running an outdated version^7, ^1please update"
+		if newestVersion:gsub("%s+", "") == currentVersion:gsub("%s+", "") then advice = '^6You are running the latest version.'
+		else print("^3Version Check^7: ^2Current^7: '^5"..currentVersion.."^7' ^2Latest^7: '^5"..newestVersion.."^7'") end
+		print(advice)
+	end)
+end
+CheckVersion()

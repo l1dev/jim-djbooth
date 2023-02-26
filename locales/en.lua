@@ -2,6 +2,7 @@ Loc["en"] = {
     notify = {
         ["load_link"] = "Loading link: ",
         ["set_audio"] = "Setting booth audio to: ",
+        ["new_volume"] = "Volume: ",
     },
     target = {
         ["dj_booth"] = "DJ Booth",
@@ -13,15 +14,10 @@ Loc["en"] = {
         ["live"] = "🔴 Live",
         ["close"] = "Close",
         ["play"] = "Play a song",
-        ["enter_url"] = "Enter a youtube URL",
         ["history"] = "Song History",
-        ["previous"] = "View previous songs",
         ["text_pause"] = "Pause Music",
-        ["sub__pause"] = "Pause music",
         ["text_resume"] = "Resume Music",
-        ["sub_resume"] = "Resume music",
-        ["volume"] = "Volume",
-        ["change_volume"] = "Change volume",
+        ["volume"] = "Volume: ",
         ["stop"] = "Stop music",
         ["off"] = "Turn off the music",
         ["back"] = "Back",
@@ -32,4 +28,4 @@ Loc["en"] = {
         ["select"] = "Song Selection",
         ["music_volume"] = "Music Volume",
     },
-} 
+}
