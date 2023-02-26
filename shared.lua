@@ -1,3 +1,4 @@
+local time = 1000
 function loadModel(model)
 	local hash = model
 	if not HasModelLoaded(model) then
