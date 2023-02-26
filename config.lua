@@ -2,11 +2,11 @@ print("^2Jim^7-^2DJBooth ^7v^41^7.^42 ^2by ^1Jimathy^7")
 
 Config = {
 	Lan = "en",
-	Debug = true, -- Set to true to show target locations
+	Debug = false, -- Set to true to show target locations
 
 	Core = "qb-core",
-	Menu = "ox",
-	Notify = "ox",
+	Menu = "qb",
+	Notify = "qb",
 
 	Locations = {
 		{ -- Vanilla Unicorn DJ Booth
