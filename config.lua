@@ -1,4 +1,4 @@
-print("^2Jim^7-^2DJBooth ^7v^41^7.^43^7.^41 ^2by ^1Jimathy^7")
+print("^2Jim^7-^2DJBooth ^7v^41^7.^43^7.^42 ^2by ^1Jimathy^7")
 
 Config = {
 	Lan = "en",

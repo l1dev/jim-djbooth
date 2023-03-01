@@ -57,17 +57,18 @@ ensure [jim]
     soundLoc = vec3(212.32, 1155.87, 227.01),   -- Add sound origin location (optional)
 },
 ```
-- You can also add them from other scripts with the event:
+- You can also add them from other scripts with the server sided event:
 ```lua
-		TriggerServerEvent("jim-djbooth:server:AddLocation",
-        { -- Sisyphus Theater
-            job = "public",
-            enableBooth = true,
-            DefaultVolume = 0.15,
-            radius = 200,
-            coords = vec3(206.9, 1181.04, 226.51),
-            soundLoc = vec3(212.32, 1155.87, 227.01),
-        },)
+TriggerEvent("jim-djbooth:server:AddLocation",
+    { -- Sisyphus Theater
+        job = "public",
+        enableBooth = true,
+        DefaultVolume = 0.15,
+        radius = 200,
+        coords = vec3(206.9, 1181.04, 226.51),
+        soundLoc = vec3(212.32, 1155.87, 227.01),
+    },
+)
 ```
 - This will make the extra dj-booth's from other scripts as plug and play as possible
 
@@ -76,6 +77,9 @@ ensure [jim]
 ![ox](https://media.discordapp.net/attachments/644980519582302208/1079437483093278740/ezgif-3-da7718a0dd.gif)
 
 # Changelog
+## v1.3.2:
+    - Now with less errors and real setup info
+
 ## v1.3.1:
     - Fix syncing locations at players load in
     - Fix the version check html link

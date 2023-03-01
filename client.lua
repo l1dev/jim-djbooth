@@ -1,18 +1,7 @@
 local QBCore = exports[Config.Core]:GetCoreObject()
-local PlayerData, Targets, Props = {}, {}, {}
-local Locations = Config.Locations
 
-AddEventHandler('onResourceStart', function(r) if (GetCurrentResourceName() ~= r) then return end
-	if GetResourceState("xsound") ~= "started" then print("xSound not started, script won't function") end
-	PlayerData = QBCore.Functions.GetPlayerData()
-	TriggerServerEvent("jim-djbooth:server:syncLocations")
-end)
-AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
-	PlayerData = QBCore.Functions.GetPlayerData()
-	TriggerServerEvent("jim-djbooth:server:syncLocations")
-end)
-RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo) PlayerData.job = JobInfo end)
-RegisterNetEvent('QBCore:Client:OnPlayerUnload', function() PlayerData = {} end)
+local PlayerData, Targets, Props = {}, {}, {}
+local Locations = {}
 
 local function removeTargets() for k in pairs(Targets) do exports['qb-target']:RemoveZone(k) end Targets = {} for i = 1, #Props do DeleteEntity(Props[i]) end Props = {} end
 
@@ -34,7 +23,23 @@ local function makeTargets()
 		end
 	end
 end
-makeTargets()
+
+local function syncLocations()
+	local p = promise.new()
+	QBCore.Functions.TriggerCallback('jim-djbooth:server:syncLocations', function(cb) p:resolve(cb) end)
+	Locations = Citizen.Await(p)
+	makeTargets()
+end
+
+AddEventHandler('onResourceStart', function(r) if (GetCurrentResourceName() ~= r) then return end
+	if GetResourceState("xsound") ~= "started" then print("xSound not started, script won't function") end
+	PlayerData = QBCore.Functions.GetPlayerData() Wait(5000) syncLocations()
+end)
+AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
+	PlayerData = QBCore.Functions.GetPlayerData() Wait(5000) syncLocations()
+end)
+RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo) PlayerData.job = JobInfo end)
+RegisterNetEvent('QBCore:Client:OnPlayerUnload', function() PlayerData = {} end)
 
 RegisterNetEvent("jim-djbooth:client:syncLocations", function(newLocations) Locations = newLocations makeTargets() end)
 
