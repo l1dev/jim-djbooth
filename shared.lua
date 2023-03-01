@@ -1,15 +1,15 @@
 local time = 1000
 function loadModel(model)
-	local hash = model
 	if not HasModelLoaded(model) then
-	if Config.PrintDebug then print("^5Debug^7: ^2Loading Model^7: '^6"..tostring(model).."^7'") end
-	while not HasModelLoaded(model) do
-		if time > 0 then time = time - 1 RequestModel(model)
-		else time = 1000 print("^5Debug^7: ^3LoadModel^7: ^2Timed out loading model ^7'^6"..model.."^7'") break
+		if Config.Debug then print("^5Debug^7: ^2Loading Model^7: '^6"..model.."^7'") end
+		while not HasModelLoaded(model) do
+			if time > 0 then time -= 1 RequestModel(model)
+			else time = 1000 print("^5Debug^7: ^3LoadModel^7: ^2Timed out loading model ^7'^6"..model.."^7'") break
+			end
+			Wait(10)
 		end
-		Wait(10)
 	end
-end end
+end
 function unloadModel(model) if Config.PrintDebug then print("^5Debug^7: ^2Removing Model^7: '^6"..model.."^7'") end SetModelAsNoLongerNeeded(model) end
 
 function makeProp(data, freeze, synced)

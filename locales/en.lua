@@ -1,7 +1,6 @@
 Loc["en"] = {
     notify = {
         ["load_link"] = "Loading link: ",
-        ["set_audio"] = "Setting booth audio to: ",
         ["new_volume"] = "Volume: ",
     },
     target = {
@@ -19,7 +18,6 @@ Loc["en"] = {
         ["text_resume"] = "Resume Music",
         ["volume"] = "Volume: ",
         ["stop"] = "Stop music",
-        ["off"] = "Turn off the music",
         ["back"] = "Back",
         ["history_play"] = "History - Press to play",
         ["youtube_url"] = "YouTube URL",

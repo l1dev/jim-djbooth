@@ -16,7 +16,7 @@ Has Dynamic menu that changes depending on state of music.
 * [PolyZone](https://github.com/qbcore-framework/PolyZone)
 * [qb-menu](https://github.com/qbcore-framework/qb-menu)
 * [qb-target](https://github.com/qbcore-framework/qb-target)
-* [ox_lib Context](https://github.com/overextended/ox_lib)
+* [ox_lib Context](https://github.com/qbcore-framework/qb-target)
 
 ## Preview
 ![unknown (12)](https://cdn.discordapp.com/attachments/976131183421317130/976210960807243796/ezgif-1-c3eeadcd5c.gif?size=4096)

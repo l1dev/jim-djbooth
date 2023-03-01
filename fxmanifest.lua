@@ -1,6 +1,6 @@
 name "Jim-DJBooth"
 author "Jimathy"
-version "1.2"
+version "1.3"
 description 'QB-DJBooth Edit By Jimathy'
 fx_version "cerulean"
 game "gta5"

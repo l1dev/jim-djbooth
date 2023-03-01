@@ -1,39 +1,42 @@
-local QBCore = exports['qb-core']:GetCoreObject()
-local PlayerData, Targets, Props, xSound = {}, {}, {}, exports.xsound
+local QBCore = exports[Config.Core]:GetCoreObject()
+local PlayerData, Targets, Props = {}, {}, {}
+local Locations = Config.Locations
 
 AddEventHandler('onResourceStart', function(r) if (GetCurrentResourceName() ~= r) then return end
-	if GetResourceState("xsound") ~= "started" then print("XSound not started, script won't function") end
+	if GetResourceState("xsound") ~= "started" then print("xSound not started, script won't function") end
 	PlayerData = QBCore.Functions.GetPlayerData()
 end)
 AddEventHandler('QBCore:Client:OnPlayerLoaded', function() PlayerData = QBCore.Functions.GetPlayerData() end)
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo) PlayerData.job = JobInfo end)
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function() PlayerData = {} end)
 
-CreateThread(function()
-	for i = 1, #Config.Locations do
-		if Config.Locations[i].enableBooth then
-			local RequireJob = nil
-			local RequireGang = nil
-			if Config.Locations[i].job then
-				RequireJob = Config.Locations[i].job
+local function removeTargets() for k in pairs(Targets) do exports['qb-target']:RemoveZone(k) end Targets = {} for i = 1, #Props do DeleteEntity(Props[i]) end Props = {} end
+
+local function makeTargets()
+	removeTargets()
+	for i = 1, #Locations do
+		if Locations[i].enableBooth then
+			local RequireJob, RequireGang = nil, nil
+			if Locations[i].job then RequireJob = Locations[i].job
 				if RequireJob == "public" then RequireJob = nil end
 			end
-			if Config.Locations[i].gang then
-				RequireGang = Config.Locations[i].RequireGang
-			end
+			if Locations[i].gang then RequireGang = Locations[i].RequireGang end
 			Targets["Booth"..i] =
-			exports['qb-target']:AddCircleZone("Booth"..i, Config.Locations[i].coords, 0.6, {name="Booth"..i, debugPoly=Config.Debug, useZ=true, },
-				{ options = { { event = "jim-djbooth:client:playMusic", icon = "fab fa-youtube", label = Loc[Config.Lan].target["dj_booth"], job = RequireJob, gang = RequireGang, zoneNum = i, coords = Config.Locations[i].coords }, }, distance = 2.0 })
-			if Config.Locations[i].prop then
-				Props[#Props+1] = makeProp({prop = Config.Locations[i].prop, coords = vec4(Config.Locations[i].coords.x, Config.Locations[i].coords.y, Config.Locations[i].coords.z, math.random(1,359)+0.0) }, true, false)
+			exports['qb-target']:AddCircleZone("Booth"..i, Locations[i].coords, 0.6, {name="Booth"..i, debugPoly=Config.Debug, useZ=true, },
+				{ options = { { event = "jim-djbooth:client:playMusic", icon = "fab fa-youtube", label = Loc[Config.Lan].target["dj_booth"], job = RequireJob, gang = RequireGang, zoneNum = i, coords = Locations[i].coords }, }, distance = 2.0 })
+			if Locations[i].prop then
+				Props[#Props+1] = makeProp({prop = Locations[i].prop, coords = vec4(Locations[i].coords.x, Locations[i].coords.y, Locations[i].coords.z, math.random(1,359)+0.0) }, true, false)
 			end
 		end
 	end
-end)
+end
+makeTargets()
+
+RegisterNetEvent("jim-djbooth:client:syncLocations", function(newLocations) Locations = newLocations makeTargets() end)
 
 RegisterNetEvent("jim-djbooth:client:playMusic", function(data)
 	local booth = ""
-	for k, v in pairs(Config.Locations) do
+	for k, v in pairs(Locations) do
 		if #(GetEntityCoords(PlayerPedId()) - v["coords"]) <= v["radius"] then
 			if v["job"] then booth = v["job"]..k elseif v["gang"] then booth = v["gang"]..k end
 		end
@@ -44,30 +47,30 @@ RegisterNetEvent("jim-djbooth:client:playMusic", function(data)
 	previousSongs = Citizen.Await(p)
 
 	-- Grab song info and build table
-	if xSound:soundExists(booth) then
+	if exports["xsound"]:soundExists(booth) then
 		song = {
-			playing = xSound:isPlaying(booth),
+			playing = exports["xsound"]:isPlaying(booth),
 			timeStamp = "",
-			url = xSound:getLink(booth),
-			icon = "https://img.youtube.com/vi/"..string.sub(xSound:getLink(booth), - 11).."/mqdefault.jpg",
+			url = exports["xsound"]:getLink(booth),
+			icon = "https://img.youtube.com/vi/"..string.sub(exports["xsound"]:getLink(booth), - 11).."/mqdefault.jpg",
 			header = "",
-			txt = xSound:getLink(booth),
-			volume = math.ceil(xSound:getVolume(booth)*100)
+			txt = exports["xsound"]:getLink(booth),
+			volume = math.ceil(exports["xsound"]:getVolume(booth)*100)
 		}
-		if xSound:isPlaying(booth) then song.header = Loc[Config.Lan].menu["cur_playing"] end
-		if xSound:isPaused(booth) then song.header = Loc[Config.Lan].menu["cur_paused"] end
-		if xSound:getMaxDuration(booth) == 0 then song.timeStamp = Loc[Config.Lan].menu["live"] end
-		if xSound:getMaxDuration(booth) > 0 then
-			local timestamp = (xSound:getTimeStamp(booth) * 10)
+		if exports["xsound"]:isPlaying(booth) then song.header = Loc[Config.Lan].menu["cur_playing"] end
+		if exports["xsound"]:isPaused(booth) then song.header = Loc[Config.Lan].menu["cur_paused"] end
+		if exports["xsound"]:getMaxDuration(booth) == 0 then song.timeStamp = Loc[Config.Lan].menu["live"] end
+		if exports["xsound"]:getMaxDuration(booth) > 0 then
+			local timestamp = (exports["xsound"]:getTimeStamp(booth) * 10)
 			local mm = (timestamp // (60 * 10)) % 60.
 			local ss = (timestamp // 10) % 60.
 			timestamp = string.format("%02d:%02d", mm, ss)
-			local duration = (xSound:getMaxDuration(booth) * 10)
+			local duration = (exports["xsound"]:getMaxDuration(booth) * 10)
 			mm = (duration // (60 * 10)) % 60.
 			ss = (duration // 10) % 60.
 			duration = string.format("%02d:%02d", mm, ss)
 			song.timeStamp = "("..timestamp.."/"..duration..")"
-			if xSound:isPlaying(booth) then song.timeStamp = "🔊 "..song.timeStamp else song.timeStamp = "🔇 "..song.timeStamp end
+			if exports["xsound"]:isPlaying(booth) then song.timeStamp = "🔊 "..song.timeStamp else song.timeStamp = "🔇 "..song.timeStamp end
 		end
 	end
 
@@ -90,7 +93,7 @@ RegisterNetEvent("jim-djbooth:client:playMusic", function(data)
 	}
 	musicMenu[#musicMenu+1] = {
 		icon = "fab fa-youtube",
-		header = song.header, txt = song.txt.."<br>"..song.timeStamp, --qb-menu
+		header = song.header, txt =  Loc[Config.Lan].menu["enter_url"], --qb-menu
 		title = Loc[Config.Lan].menu["play"], -- ox_lib
 		header = Loc[Config.Lan].menu["play"],
 		event = "jim-djbooth:client:musicMenu",	args = { zoneNum = data.zoneNum }, -- ox_lib
@@ -105,8 +108,8 @@ RegisterNetEvent("jim-djbooth:client:playMusic", function(data)
 			params = { event = "jim-djbooth:client:history", args = { history = previousSongs[booth], zoneNum = data.zoneNum } }
 		}
 	end
-	if xSound:soundExists(booth) then
-		if xSound:isPlaying(booth) then
+	if exports["xsound"]:soundExists(booth) then
+		if exports["xsound"]:isPlaying(booth) then
 			musicMenu[#musicMenu+1] = {
 				icon = "fas fa-pause",
 				header = Loc[Config.Lan].menu["text_pause"],
@@ -114,7 +117,7 @@ RegisterNetEvent("jim-djbooth:client:playMusic", function(data)
 				serverEvent = "jim-djbooth:server:PauseResume", args = { zoneNum = data.zoneNum },
 				params = { isServer = true, event = "jim-djbooth:server:PauseResume", args = { zoneNum = data.zoneNum } }
 			}
-		elseif xSound:isPaused(booth) then
+		elseif exports["xsound"]:isPaused(booth) then
 			musicMenu[#musicMenu+1] = {
 				icon = "fas fa-play",
 				header = Loc[Config.Lan].menu["text_resume"],
@@ -133,7 +136,7 @@ RegisterNetEvent("jim-djbooth:client:playMusic", function(data)
 		}
 		musicMenu[#musicMenu+1] = {
 			icon = "fas fa-stop",
-			header = Loc[Config.Lan].menu["stop"], txt = Loc[Config.Lan].menu["off"],
+			header = Loc[Config.Lan].menu["stop"],
 			title = Loc[Config.Lan].menu["stop"],
 			serverEvent = "jim-djbooth:server:stopMusic", args = { zoneNum = data.zoneNum }, -- ox_lib
 			params = { isServer = true,	event = "jim-djbooth:server:stopMusic",	args = { zoneNum = data.zoneNum } }
