@@ -2,7 +2,7 @@ print("^2Jim^7-^2DJBooth ^7v^41^7.^43 ^2by ^1Jimathy^7")
 
 Config = {
 	Lan = "en",
-	Debug = true, -- Set to true to show target locations
+	Debug = false, -- Set to true to show target locations
 
 	Core = "qb-core",
 	Menu = "qb",
@@ -11,7 +11,7 @@ Config = {
 	Locations = {
 		{ -- Vanilla Unicorn DJ Booth
 			job = "vanilla", -- Set this to required job role
-			enableBooth = false, -- option to disable rather than deleting code
+			enableBooth = true, -- option to disable rather than deleting code
 			DefaultVolume = 0.1, -- 0.01 is lowest, 1.0 is max
 			radius = 30, -- The radius of the sound from the booth
 			coords = vec3(120.0, -1281.72, 29.48), -- Where the booth is located
