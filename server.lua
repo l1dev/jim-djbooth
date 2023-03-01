@@ -14,6 +14,8 @@ RegisterNetEvent('jim-djbooth:server:AddLocation', function(data)
 	TriggerClientEvent("jim-djbooth:client:syncLocations", -1, Config.Locations)
 end)
 
+RegisterNetEvent("jim-djbooth:server:syncLocations", function() TriggerClientEvent("jim-jobgarage:client:syncLocations", -1, Config.Locations) end)
+
 RegisterNetEvent('jim-djbooth:server:playMusic', function(song, zoneNum)
     local src, coords, Booth = source, GetEntityCoords(ped), Config.Locations[zoneNum]
 	local zoneLabel = ""..(Booth.gang or Booth.job)..zoneNum

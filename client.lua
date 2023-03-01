@@ -5,8 +5,12 @@ local Locations = Config.Locations
 AddEventHandler('onResourceStart', function(r) if (GetCurrentResourceName() ~= r) then return end
 	if GetResourceState("xsound") ~= "started" then print("xSound not started, script won't function") end
 	PlayerData = QBCore.Functions.GetPlayerData()
+	TriggerServerEvent("jim-djbooth:server:syncLocations")
 end)
-AddEventHandler('QBCore:Client:OnPlayerLoaded', function() PlayerData = QBCore.Functions.GetPlayerData() end)
+AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
+	PlayerData = QBCore.Functions.GetPlayerData()
+	TriggerServerEvent("jim-djbooth:server:syncLocations")
+end)
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo) PlayerData.job = JobInfo end)
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function() PlayerData = {} end)
 
