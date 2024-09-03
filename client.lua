@@ -3,26 +3,58 @@ local QBCore = exports[Config.Core]:GetCoreObject()
 local PlayerData, Targets, Props = {}, {}, {}
 local Locations = {}
 
-local function removeTargets() for k in pairs(Targets) do exports['qb-target']:RemoveZone(k) end Targets = {} for i = 1, #Props do DeleteEntity(Props[i]) end Props = {} end
+local function removeTargets()
+    for k in pairs(Targets) do
+        exports.ox_target:removeZone(k)
+    end
+    Targets = {}
+    for i = 1, #Props do
+        DeleteEntity(Props[i])
+    end
+    Props = {}
+end
 
 local function makeTargets()
-	removeTargets()
-	for i = 1, #Locations do
-		if Locations[i].enableBooth then
-			local RequireJob, RequireGang = nil, nil
-			if Locations[i].job then RequireJob = Locations[i].job
-				if RequireJob == "public" then RequireJob = nil end
-			end
-			if Locations[i].gang then RequireGang = Locations[i].RequireGang end
-			Targets["Booth"..i] =
-			exports['qb-target']:AddCircleZone("Booth"..i, Locations[i].coords, 0.6, {name="Booth"..i, debugPoly=Config.Debug, useZ=true, },
-				{ options = { { event = "jim-djbooth:client:playMusic", icon = "fab fa-youtube", label = Loc[Config.Lan].target["dj_booth"], job = RequireJob, gang = RequireGang, zoneNum = i, coords = Locations[i].coords }, }, distance = 2.0 })
-			if Locations[i].prop then
-				Props[#Props+1] = makeProp({prop = Locations[i].prop, coords = vec4(Locations[i].coords.x, Locations[i].coords.y, Locations[i].coords.z, math.random(1,359)+0.0) }, true, false)
-			end
-		end
-	end
+    removeTargets()
+    for i = 1, #Locations do
+        if Locations[i].enableBooth then
+            local RequireJob, RequireGang = nil, nil
+            if Locations[i].job then 
+                RequireJob = Locations[i].job
+                if RequireJob == "public" then 
+                    RequireJob = nil 
+                end
+            end
+            if Locations[i].gang then 
+                RequireGang = Locations[i].gang 
+            end
+
+            Targets["Booth"..i] = exports.ox_target:addSphereZone({
+                coords = Locations[i].coords,
+                radius = 0.6,
+                options = {
+                    {
+                        name = "Booth"..i,
+                        event = "jim-djbooth:client:playMusic",
+                        icon = "fab fa-youtube",
+                        label = Loc[Config.Lan].target["dj_booth"],
+                        job = RequireJob,
+                        gang = RequireGang,
+                        zoneNum = i,
+                        coords = Locations[i].coords
+                    }
+                },
+                distance = 2.0,
+                debug = Config.Debug,
+            })
+
+            if Locations[i].prop then
+                Props[#Props+1] = makeProp({prop = Locations[i].prop, coords = vec4(Locations[i].coords.x, Locations[i].coords.y, Locations[i].coords.z, math.random(1,359)+0.0)}, true, false)
+            end
+        end
+    end
 end
+
 
 local function syncLocations()
 	local p = promise.new()
@@ -233,9 +265,14 @@ RegisterNetEvent('jim-djbooth:client:changeVolume', function(data)
     end
 end)
 
-AddEventHandler('onResourceStop', function(r) if r ~= GetCurrentResourceName() then return end
-	if GetResourceState("qb-target") == "started" or GetResourceState("ox_target") == "started" then
-		for k in pairs(Targets) do exports['qb-target']:RemoveZone(k) end
-		for i = 1, #Props do DeleteEntity(Props[i]) end
-	end
+AddEventHandler('onResourceStop', function(r)
+    if r ~= GetCurrentResourceName() then return end
+    if GetResourceState("ox_target") == "started" then
+        for k in pairs(Targets) do
+            exports.ox_target:removeZone(k)
+        end
+        for i = 1, #Props do
+            DeleteEntity(Props[i])
+        end
+    end
 end)
