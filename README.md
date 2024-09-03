@@ -13,7 +13,7 @@ Has Dynamic menu that changes depending on state of music.
 * [xsound](https://github.com/Xogy/xsound)
 * [PolyZone](https://github.com/qbcore-framework/PolyZone)
 * [qb-menu](https://github.com/qbcore-framework/qb-menu)
-* [qb-target](https://github.com/qbcore-framework/qb-target)
+* [ox-_target](https://github.com/overextended/ox_target)
 * [ox_lib Context](https://github.com/qbcore-framework/qb-target) (optional)
 
 
